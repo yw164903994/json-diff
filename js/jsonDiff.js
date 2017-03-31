@@ -15,10 +15,9 @@ function diff(oldObj, newObj) {
                     result[index] = newValue;
                 }
             }
-            if (Object.keys(result).length == 0) {
+            if (newObj.length == oldObj.length && Object.keys(result).length == 0) {
                 return undefined;
             }
-            result["$type"] = "array";
             result["$length"] = newObj.length;
             return result;
         }
@@ -51,13 +50,8 @@ exports.diff = diff;
 function apply(oldObj, diffObj) {
     var oldObjType = getType(oldObj);
     var diffObjType = getType(diffObj);
-    if (diffObjType == "object") {
-        var type = diffObj["$type"];
-        if (type !== undefined) {
-            diffObjType = type;
-        }
-    }
-    if (diffObjType == "array") {
+    if (diffObjType == "object" && diffObj["$length"] !== undefined) {
+        diffObjType = "array";
         var length_1 = diffObj["$length"];
         if (diffObjType == oldObjType) {
             while (oldObj.length < length_1) {
@@ -67,7 +61,7 @@ function apply(oldObj, diffObj) {
                 oldObj.splice(length_1, oldObj.length - length_1);
             }
             for (var index in diffObj) {
-                if (index.indexOf("$") == -1) {
+                if (index.indexOf("$") != 0) {
                     oldObj[index] = apply(oldObj[index], diffObj[index]);
                 }
             }
@@ -79,7 +73,7 @@ function apply(oldObj, diffObj) {
                 result.push(undefined);
             }
             for (var index in diffObj) {
-                if (index.indexOf("$") == -1) {
+                if (index.indexOf("$") != 0) {
                     result[index] = diffObj[index];
                 }
             }
@@ -95,7 +89,7 @@ function apply(oldObj, diffObj) {
                 }
             }
             for (var index in diffObj) {
-                if (index.indexOf("$") == -1) {
+                if (index.indexOf("$") != 0) {
                     oldObj[index] = apply(oldObj[index], diffObj[index]);
                 }
             }
@@ -103,7 +97,7 @@ function apply(oldObj, diffObj) {
         }
         else {
             for (var index in diffObj) {
-                if (index.indexOf("$") == -1) {
+                if (index.indexOf("$") == 0) {
                     delete diffObj[index];
                 }
             }

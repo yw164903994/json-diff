@@ -14,10 +14,9 @@ export function diff (oldObj: any, newObj: any): any {
 					result[index] = newValue;
 				}
 			}
-			if (Object.keys(result).length == 0) {
+			if (newObj.length == oldObj.length && Object.keys(result).length == 0) {
 				return undefined;
 			}
-			result["$type"] = "array";
 			result["$length"] = newObj.length;
 			return result;
 		}
@@ -49,13 +48,8 @@ export function diff (oldObj: any, newObj: any): any {
 export function apply (oldObj: any, diffObj: any): any {
 	let oldObjType = getType(oldObj);
 	let diffObjType = getType(diffObj);
-	if (diffObjType == "object") {
-		let type = diffObj["$type"];
-		if (type !== undefined) {
-			diffObjType = type;
-		}
-	}
-	if (diffObjType == "array") {
+	if (diffObjType == "object" && diffObj["$length"] !== undefined) {
+		diffObjType = "array";
 		let length = diffObj["$length"];
 		if (diffObjType == oldObjType) {
 			while (oldObj.length < length) {
@@ -65,7 +59,7 @@ export function apply (oldObj: any, diffObj: any): any {
 				oldObj.splice(length, oldObj.length - length);
 			}
 			for (let index in diffObj) {
-				if (index.indexOf("$") == -1) {
+				if (index.indexOf("$") != 0) {
 					oldObj[index] = apply(oldObj[index], diffObj[index]);
 				}
 			}
@@ -77,7 +71,7 @@ export function apply (oldObj: any, diffObj: any): any {
 				result.push(undefined);
 			}
 			for (let index in diffObj) {
-				if (index.indexOf("$") == -1) {
+				if (index.indexOf("$") != 0) {
 					result[index] = diffObj[index];
 				}
 			}
@@ -94,7 +88,7 @@ export function apply (oldObj: any, diffObj: any): any {
 				}
 			}
 			for (let index in diffObj) {
-				if (index.indexOf("$") == -1) {
+				if (index.indexOf("$") != 0) {
 					oldObj[index] = apply(oldObj[index], diffObj[index]);
 				}
 			}
@@ -102,7 +96,7 @@ export function apply (oldObj: any, diffObj: any): any {
 		}
 		else {
 			for (let index in diffObj) {
-				if (index.indexOf("$") == -1) {
+				if (index.indexOf("$") == 0) {
 					delete diffObj[index];
 				}
 			}
