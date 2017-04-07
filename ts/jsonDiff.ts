@@ -28,14 +28,14 @@ export function diff (oldObj: any, newObj: any): any {
 					result[index] = newValue;
 				}
 			}
-			let deletes: string[] = [];
+			let unset: string[] = [];
 			for (let index in oldObj) {
 				if (newObj[index] === undefined) {
-					deletes.push(index);
+					unset.push(index);
 				}
 			}
-			if (deletes.length > 0) {
-				result["$deletes"] = deletes;
+			if (unset.length > 0) {
+				result["$unset"] = unset;
 			}
 			if (Object.keys(result).length == 0) {
 				return undefined;
@@ -81,10 +81,10 @@ export function apply (oldObj: any, diffObj: any): any {
 	}
 	else if (diffObjType == "object") {
 		if (diffObjType == oldObjType) {
-			let deletes = diffObj["$deletes"];
-			if (deletes !== undefined) {
-				for (let i = 0; i < deletes.length; i++) {
-					delete oldObj[deletes[i]];
+			let unset = diffObj["$unset"];
+			if (unset !== undefined) {
+				for (let i = 0; i < unset.length; i++) {
+					delete oldObj[unset[i]];
 				}
 			}
 			for (let index in diffObj) {

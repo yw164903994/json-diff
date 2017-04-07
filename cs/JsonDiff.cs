@@ -51,9 +51,9 @@ public static class JsonDiff {
 		else if (diffObjType == TypeNameLower (new Dictionary<string, object> ())) {
 			if (diffObjType == oldObjType) {
 				Dictionary<string, object> oldObjDict = oldObj as Dictionary<string, object>;
-				object deletes = null;
-				if (diffObjDict.TryGetValue ("$deletes", out deletes)) {
-					List<object> deleteList = deletes as List<object>;
+				object unset = null;
+				if (diffObjDict.TryGetValue ("$unset", out unset)) {
+					List<object> deleteList = unset as List<object>;
 					foreach (object deleteObj in deleteList) {
 						oldObjDict.Remove (deleteObj.ToString ());
 					}

@@ -29,14 +29,14 @@ function diff(oldObj, newObj) {
                     result[index] = newValue;
                 }
             }
-            var deletes = [];
+            var unset = [];
             for (var index in oldObj) {
                 if (newObj[index] === undefined) {
-                    deletes.push(index);
+                    unset.push(index);
                 }
             }
-            if (deletes.length > 0) {
-                result["$deletes"] = deletes;
+            if (unset.length > 0) {
+                result["$unset"] = unset;
             }
             if (Object.keys(result).length == 0) {
                 return undefined;
@@ -82,10 +82,10 @@ function apply(oldObj, diffObj) {
     }
     else if (diffObjType == "object") {
         if (diffObjType == oldObjType) {
-            var deletes = diffObj["$deletes"];
-            if (deletes !== undefined) {
-                for (var i = 0; i < deletes.length; i++) {
-                    delete oldObj[deletes[i]];
+            var unset = diffObj["$unset"];
+            if (unset !== undefined) {
+                for (var i = 0; i < unset.length; i++) {
+                    delete oldObj[unset[i]];
                 }
             }
             for (var index in diffObj) {
